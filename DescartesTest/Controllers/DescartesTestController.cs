@@ -11,6 +11,8 @@ namespace DescartesTest.Controllers
     {
         private readonly ILogger<DescartesTestController> _logger;
 
+        private static Dictionary<string, Diff> _dictionary = new Dictionary<string, Diff>();
+
         public DescartesTestController(ILogger<DescartesTestController> logger)
         {
             // not used
@@ -115,15 +117,22 @@ namespace DescartesTest.Controllers
         /// <returns>Diff object</returns>
         private Diff? GetFromSession(string id)
         {
-            string? diffStr = HttpContext.Session.GetString(id);
-            if (diffStr == null)
+            if (_dictionary.ContainsKey(id))
             {
-                return null;
+                return _dictionary[id];
             }
 
-            var diff = JsonConvert.DeserializeObject<Diff>(diffStr);
+            return null;
 
-            return diff;
+            //string? diffStr = HttpContext.Session.GetString(id);
+            //if (diffStr == null)
+            //{
+            //    return null;
+            //}
+
+            //var diff = JsonConvert.DeserializeObject<Diff>(diffStr);
+
+            //return diff;
 
         }
 
@@ -134,8 +143,16 @@ namespace DescartesTest.Controllers
         /// <param name="diff">Diff object param</param>
         private void AddToSession(string id, Diff diff)
         {
-            var diffStr = JsonConvert.SerializeObject(diff);
-            HttpContext.Session.SetString(id, diffStr);
+            if (_dictionary.ContainsKey(id))
+            {
+                _dictionary[id] = diff;
+            }
+            else
+            {
+                _dictionary.Add(id, diff);
+            }
+            //var diffStr = JsonConvert.SerializeObject(diff);
+            //HttpContext.Session.SetString(id, diffStr);
         }
 
         /// <summary>

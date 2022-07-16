@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
 
@@ -21,10 +22,6 @@ namespace DescartesTest.Test
 
             _cookieContainer = new CookieContainer();
             _clientHandler = new HttpClientHandler { AllowAutoRedirect = true, UseCookies = true, CookieContainer = _cookieContainer };
-
-            //var defaultHttpClient = webAppFactory.CreateClient(); 
-
-            //_httpClient = new HttpClient(_clientHandler);
 
             _httpClient = webAppFactory.CreateDefaultClient();
 
@@ -59,14 +56,6 @@ namespace DescartesTest.Test
         [TestMethod]
         public async Task Diff_SameLeftAndRightAdded_ReturnsOk()
         {
-
-            // this test doesn't passes via HttpClient because of cookies, but it passes in webbrowser via swagger
-            // using new HttpClient and CookieContainer throws error "No connection could be made because the target machine actively refused it"
-
-            //_httpClient = new HttpClient(_clientHandler);
-
-            return;
-
             string payload = JsonConvert.SerializeObject(new
             {
                 data = "AAAAAA=="
@@ -79,7 +68,6 @@ namespace DescartesTest.Test
             var responseRight = await _httpClient.PutAsync("v1/diff/1/right", content);
 
 
-
             Assert.AreEqual(HttpStatusCode.Created, responseLeft.StatusCode);
             Assert.AreEqual(HttpStatusCode.Created, responseRight.StatusCode);
 
@@ -89,14 +77,15 @@ namespace DescartesTest.Test
 
             var responseContent = await responseDiff.Content.ReadAsStringAsync();
 
+            var json = JObject.Parse(responseContent);
+
+            var actual = json.GetValue("diffResultType");
+
             Assert.IsNotNull(responseContent);
 
-            string expectedResult = JsonConvert.SerializeObject(new
-            {
-                diffResultType = "Equals"
-            });
+            string expectedResult = "Equals";
 
-            Assert.AreEqual(expectedResult, responseContent);
+            Assert.AreEqual(expectedResult, actual);
 
         }
     }
