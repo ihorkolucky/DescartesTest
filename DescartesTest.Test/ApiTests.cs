@@ -25,7 +25,6 @@ namespace DescartesTest.Test
             //var defaultHttpClient = webAppFactory.CreateClient(); 
 
             //_httpClient = new HttpClient(_clientHandler);
-            //_httpClient.BaseAddress = defaultHttpClient.BaseAddress;
 
             _httpClient = webAppFactory.CreateDefaultClient();
 
@@ -61,7 +60,10 @@ namespace DescartesTest.Test
         public async Task Diff_SameLeftAndRightAdded_ReturnsOk()
         {
 
-            // this test doesn't passes because of cookies, but it passes in webbrowser
+            // this test doesn't passes via HttpClient because of cookies, but it passes in webbrowser via swagger
+            // using new HttpClient and CookieContainer throws error "No connection could be made because the target machine actively refused it"
+
+            //_httpClient = new HttpClient(_clientHandler);
 
             return;
 
